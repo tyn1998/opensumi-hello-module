@@ -19,7 +19,7 @@ export const Todo = ({
       isChecked: true
     }
   ]);
-  const { showMessage } = useInjectable<ITodoService>(ITodoService);
+  const { showMessage, onDidChange } = useInjectable<ITodoService>(ITodoService);
 
   const template = ({ data, index }: { data: ITodo; index: number }) => {
     const handlerChange = () => {
@@ -41,6 +41,20 @@ export const Todo = ({
       </div>
     );
   };
+
+  React.useEffect(() => {
+    const disposable = onDidChange((value: string) => {
+      const newTodos = todos.slice(0);
+      newTodos.push({
+        description: value,
+        isChecked: false,
+      });
+      setTodos(newTodos);
+    });
+    return () => {
+      disposable.dispose();
+    };
+  }, [todos]);
 
   return (
     <RecycleList
