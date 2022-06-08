@@ -1,15 +1,19 @@
 import { Injectable, Autowired } from '@opensumi/di';
 import { IMessageService } from '@opensumi/ide-overlay';
 import { Emitter, IQuickInputService } from '@opensumi/ide-core-browser';
-import { ITodoService } from '../common';
+import { ITodoConnectionServerPath, ITodoNodeService, ITodoService } from '../common';
+import { RPCService } from '@opensumi/ide-connection';
 
 @Injectable()
-export class TodoService implements ITodoService {
+export class TodoService extends RPCService implements ITodoService {
   @Autowired(IMessageService)
   private messageService: IMessageService;
 
   @Autowired(IQuickInputService)
   private quickInputService: IQuickInputService;
+
+  @Autowired(ITodoConnectionServerPath)
+  private todoNodeService: ITodoNodeService;
 
   private onDidChangeEmitter: Emitter<string> = new Emitter();
 
@@ -18,6 +22,11 @@ export class TodoService implements ITodoService {
   }
 
   showMessage = (message: string) => {
+    this.messageService.info(message);
+    this.todoNodeService.showMessage(message);
+  };
+
+  onMessage = (message: string) => {
     this.messageService.info(message);
   };
 
